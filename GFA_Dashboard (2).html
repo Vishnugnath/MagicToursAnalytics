@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFA Travel — Management Dashboard 2025</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Fallback: ensure fonts are readable even if Google Fonts fails */
+  @font-face {
+    
+    src: local('Arial Black'), local('Impact');
+  }
+</style>
+<style>
+:root {
+  --bg: #f0f2f7;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --blue: #3b82f6;
+  --blue-light: #eff6ff;
+  --blue-dark: #1d4ed8;
+  --green: #10b981;
+  --green-light: #ecfdf5;
+  --orange: #f59e0b;
+  --orange-light: #fffbeb;
+  --red: #ef4444;
+  --red-light: #fef2f2;
+  --purple: #8b5cf6;
+  --purple-light: #f5f3ff;
+  --teal: #14b8a6;
+  --indigo: #6366f1;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);overflow:hidden}
+body{display:flex;flex-direction:column}
+
+/* ── TOP NAV ── */
+#topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 60%,#1d4ed8 100%);
+  padding:0 24px;height:54px;flex-shrink:0;z-index:100;
+  position:relative;
+}
+#topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--teal),var(--green));
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:rgba(255,255,255,0.2);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-family:'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;font-weight:800;font-size:12px;color:#fff;
+  border:1px solid rgba(255,255,255,0.3)}
+.logo-text{font-family:'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;font-weight:700;font-size:15px;
+  letter-spacing:.5px;color:#fff}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.65);font-weight:400}
+.nav-tabs{display:flex;gap:2px;align-items:center}
+.nav-tab{
+  padding:6px 14px;border-radius:6px;font-size:11.5px;font-weight:500;
+  cursor:pointer;transition:all .2s;color:rgba(255,255,255,0.7);border:none;background:none;
+  font-family:'Inter','Segoe UI',system-ui,sans-serif;white-space:nowrap;
+}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.12)}
+.nav-tab.active{background:rgba(255,255,255,0.2);color:#fff;font-weight:600;border:1px solid rgba(255,255,255,0.3)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.year-badge{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
+  padding:4px 12px;border-radius:20px;font-size:11px;color:#fff;font-weight:600}
+.live-dot{display:flex;align-items:center;gap:5px;font-size:10.5px;color:rgba(255,255,255,0.7)}
+.dot{width:7px;height:7px;background:#22c55e;border-radius:50%;
+  animation:pulse 2s infinite;box-shadow:0 0 6px #22c55e}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── FILTERS BAR ── */
+#filterbar{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border-bottom:2px solid var(--border);
+  padding:10px 24px;flex-shrink:0;flex-wrap:wrap;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+.filter-label{font-size:10px;color:var(--text-muted);font-weight:700;
+  text-transform:uppercase;letter-spacing:.8px;margin-right:2px}
+.filter-select{
+  background:var(--bg);border:1px solid var(--border);
+  color:var(--text-primary);font-size:11.5px;padding:5px 10px;border-radius:6px;
+  font-family:'Inter','Segoe UI',system-ui,sans-serif;cursor:pointer;outline:none;
+  transition:border-color .2s;
+}
+.filter-select:focus{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-light)}
+.filter-divider{width:1px;height:22px;background:var(--border);margin:0 4px}
+.filter-btn{
+  background:var(--blue);color:#fff;border:none;padding:6px 16px;
+  border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;
+  font-family:'Inter','Segoe UI',system-ui,sans-serif;margin-left:auto;transition:background .2s;
+}
+.filter-btn:hover{background:var(--blue-dark)}
+.filter-active-tag{
+  background:var(--blue-light);color:var(--blue-dark);
+  font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;
+  display:none;align-items:center;gap:4px;
+}
+.filter-active-tag.visible{display:flex}
+
+/* ── MAIN CONTENT ── */
+#content{flex:1;overflow:auto;padding:16px 20px;display:none}
+#content.active{display:block}
+
+/* ── KPI CARDS ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.kpi-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);transition:box-shadow .2s;
+}
+.kpi-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08)}
+.kpi-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--accent-color,var(--blue))}
+.kpi-icon{font-size:20px;margin-bottom:8px}
+.kpi-label{font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.7px}
+.kpi-value{font-family:'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;font-size:22px;font-weight:800;
+  color:var(--text-primary);margin:4px 0 2px;line-height:1}
+.kpi-sub{font-size:10px;color:var(--text-muted)}
+.kpi-badge{
+  display:inline-flex;align-items:center;gap:3px;
+  background:var(--green-light);color:var(--green);
+  font-size:9.5px;font-weight:700;padding:2px 8px;
+  border-radius:20px;margin-top:5px;
+}
+.kpi-badge.neg{background:var(--red-light);color:var(--red)}
+.kpi-badge.neu{background:var(--orange-light);color:#d97706}
+
+/* ── CHARTS GRID ── */
+.charts-row{display:grid;gap:12px;margin-bottom:12px}
+.cols-2{grid-template-columns:1fr 1fr}
+.cols-3{grid-template-columns:1fr 1fr 1fr}
+.cols-21{grid-template-columns:2fr 1fr}
+.cols-12{grid-template-columns:1fr 2fr}
+.cols-13{grid-template-columns:1fr 3fr}
+.chart-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+.chart-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.chart-title{font-family:'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;font-size:12.5px;font-weight:700;color:var(--text-primary);
+  letter-spacing:.2px}
+.chart-subtitle{font-size:10px;color:var(--text-muted);margin-top:2px}
+.chart-badge{font-size:10px;color:var(--blue);background:var(--blue-light);
+  padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
+canvas{max-height:220px}
+.chart-card.tall canvas{max-height:260px}
+.chart-card.xtall canvas{max-height:320px}
+
+/* ── TABLES ── */
+.table-wrap{overflow:auto;max-height:230px}
+.dash-table{width:100%;border-collapse:collapse;font-size:11px}
+.dash-table th{
+  background:var(--bg);color:var(--text-muted);font-weight:700;
+  text-transform:uppercase;font-size:9.5px;letter-spacing:.6px;
+  padding:8px 10px;text-align:left;position:sticky;top:0;z-index:1;
+  border-bottom:1px solid var(--border);
+}
+.dash-table td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text-primary)}
+.dash-table tr:hover td{background:#f8faff}
+.dash-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:700;
+  background:var(--bg);color:var(--text-muted)}
+.rank-badge.top3{background:var(--orange);color:#fff}
+.profit-pill{display:inline-block;padding:2px 8px;border-radius:20px;
+  font-size:10px;font-weight:600;background:var(--green-light);color:var(--green)}
+.profit-pill.low{background:var(--red-light);color:var(--red)}
+
+/* ── CATEGORY CARDS ── */
+.cat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+.cat-card{
+  background:var(--card);border:2px solid var(--border);border-radius:10px;
+  padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.cat-card:hover{border-color:var(--cat-color);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+.cat-card.selected{border-color:var(--cat-color);box-shadow:0 0 0 1px var(--cat-color),0 4px 12px rgba(0,0,0,0.08)}
+.cat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cat-color)}
+.cat-dot{width:8px;height:8px;border-radius:50%;background:var(--cat-color);margin-bottom:8px}
+.cat-name{font-size:9.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.cat-val{font-family:'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;font-size:17px;font-weight:800;color:var(--text-primary)}
+.cat-profit{font-size:10px;color:var(--text-muted);margin-top:3px}
+
+/* ── PAGE HEADER ── */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.page-title{font-family:'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;font-size:18px;font-weight:800;
+  letter-spacing:-.3px;color:var(--text-primary)}
+.page-desc{font-size:11px;color:var(--text-muted);margin-top:2px}
+.page-kpis{display:flex;gap:20px}
+.inline-kpi{text-align:right}
+.inline-kpi-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.inline-kpi-val{font-family:'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;font-size:17px;font-weight:800}
+
+/* ── PROGRESS BARS ── */
+.progress-list{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.progress-item{display:flex;flex-direction:column;gap:3px}
+.progress-label{display:flex;justify-content:space-between;font-size:10px}
+.progress-name{color:var(--text-primary);font-weight:600;max-width:160px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progress-val{color:var(--text-secondary)}
+.progress-bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .8s ease}
+
+/* ── SUMMARY SECTION HEADER ── */
+.section-header{
+  font-family:'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;font-size:11px;font-weight:700;
+  color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;
+  margin:0 0 8px;display:flex;align-items:center;gap:8px;
+}
+.section-header::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── FILTER STATUS ── */
+.filter-status-bar{
+  display:none;align-items:center;gap:8px;
+  background:var(--blue-light);border:1px solid var(--blue);
+  border-radius:8px;padding:6px 12px;margin-bottom:10px;font-size:11px;
+  color:var(--blue-dark);font-weight:600;
+}
+.filter-status-bar.visible{display:flex}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1200px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .cat-grid{grid-template-columns:repeat(3,1fr)}
+  .cols-3{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo">
+    <div class="logo-mark">GFA</div>
+    <div>
+      <div class="logo-text">GFA Travel Analytics</div>
+      <div class="logo-sub">Management Performance Dashboard</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('summary')">Executive Summary</button>
+    <button class="nav-tab" onclick="showPage('corp')">Corporate Ticket</button>
+    <button class="nav-tab" onclick="showPage('dq')">DQ Bookings</button>
+    <button class="nav-tab" onclick="showPage('general')">General Ticket</button>
+    <button class="nav-tab" onclick="showPage('hotel')">Hotel TP Sales</button>
+    <button class="nav-tab" onclick="showPage('others')">Others</button>
+    <button class="nav-tab" onclick="showPage('tour')">Tour Package</button>
+  </div>
+  <div class="topbar-right">
+    <div class="year-badge">FY 2025</div>
+    <div class="live-dot"><div class="dot"></div>Live Data</div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div id="filterbar">
+  <span class="filter-label">Filter:</span>
+  <select class="filter-select" id="f-month" onchange="applyFilters()">
+    <option value="">All Months</option>
+    <option>January</option><option>February</option><option>March</option>
+    <option>April</option><option>May</option><option>June</option>
+    <option>July</option><option>August</option><option>September</option>
+    <option>October</option><option>November</option><option>December</option>
+  </select>
+  <div class="filter-divider"></div>
+  <select class="filter-select" id="f-product" onchange="applyFilters()">
+    <option value="">All Products</option>
+    <option>Corporate Ticket</option><option>General Ticket</option>
+    <option>Hotel TP Sales</option><option>DQ Bookings</option>
+    <option>Others</option><option>Tour Package</option>
+  </select>
+  <div class="filter-divider"></div>
+  <select class="filter-select" id="f-staff" onchange="applyFilters()">
+    <option value="">All Staff</option>
+    <option>WASEEM</option><option>NIYAS</option><option>ASHIQUE</option>
+    <option>AJI</option><option>MUSTAFA</option><option>FAISAL</option>
+  </select>
+  <div id="filter-active-tag" class="filter-active-tag">
+    <span id="filter-active-text">Filtered</span>
+  </div>
+  <button class="filter-btn" onclick="resetFilters()">↺ Reset</button>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- PAGE 1: EXECUTIVE SUMMARY              -->
+<!-- ════════════════════════════════════════ -->
+<div id="page-summary" style="flex:1;overflow:auto;padding:16px 20px;display:none">
+
+  <!-- Filter status bar -->
+  <div id="summary-filter-status" class="filter-status-bar">
+    <span>🔍</span><span id="summary-filter-text">Showing filtered data</span>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid" id="kpi-grid-summary">
+    <div class="kpi-card" style="--accent-color:linear-gradient(90deg,var(--blue),#60a5fa)">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-label">Total Revenue</div>
+      <div class="kpi-value" id="kpi-revenue">3.96M</div>
+      <div class="kpi-sub">QAR — 2025</div>
+      <div class="kpi-badge">▲ Active</div>
+    </div>
+    <div class="kpi-card" style="--accent-color:var(--green)">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-label">Total Profit</div>
+      <div class="kpi-value" id="kpi-profit">395.8K</div>
+      <div class="kpi-sub">QAR — Gross Profit</div>
+      <div class="kpi-badge">▲ 9.99%</div>
+    </div>
+    <div class="kpi-card" style="--accent-color:var(--orange)">
+      <div class="kpi-icon">%</div>
+      <div class="kpi-label">Profit Margin</div>
+      <div class="kpi-value" id="kpi-margin">9.99%</div>
+      <div class="kpi-sub">Avg across all categories</div>
+      <div class="kpi-badge neu">Moderate</div>
+    </div>
+    <div class="kpi-card" style="--accent-color:var(--purple)">
+      <div class="kpi-icon">🔖</div>
+      <div class="kpi-label">Transactions</div>
+      <div class="kpi-value" id="kpi-txns">3,079</div>
+      <div class="kpi-sub">Total bookings</div>
+      <div class="kpi-badge">▲ 440/mo avg</div>
+    </div>
+    <div class="kpi-card" style="--accent-color:var(--teal)">
+      <div class="kpi-icon">✈</div>
+      <div class="kpi-label">GDS Segments</div>
+      <div class="kpi-value" id="kpi-gds">2,214</div>
+      <div class="kpi-sub">Flight segments</div>
+      <div class="kpi-badge">Corp + General</div>
+    </div>
+  </div>
+
+  <!-- Category Overview Cards -->
+  <div class="section-header">Category Breakdown</div>
+  <div class="cat-grid" id="cat-grid">
+    <div class="cat-card selected" style="--cat-color:var(--blue)" onclick="filterByProduct('Corporate Ticket')">
+      <div class="cat-dot"></div>
+      <div class="cat-name">Corporate Ticket</div>
+      <div class="cat-val" id="cat-corp-val">1.29M</div>
+      <div class="cat-profit" id="cat-corp-detail">Profit: 96K · 957 txns</div>
+    </div>
+    <div class="cat-card" style="--cat-color:var(--teal)" onclick="filterByProduct('General Ticket')">
+      <div class="cat-dot"></div>
+      <div class="cat-name">General Ticket</div>
+      <div class="cat-val" id="cat-gen-val">1.85M</div>
+      <div class="cat-profit" id="cat-gen-detail">Profit: 115K · 1,289 txns</div>
+    </div>
+    <div class="cat-card" style="--cat-color:var(--orange)" onclick="filterByProduct('Hotel TP Sales')">
+      <div class="cat-dot"></div>
+      <div class="cat-name">Hotel TP Sales</div>
+      <div class="cat-val" id="cat-hotel-val">306K</div>
+      <div class="cat-profit" id="cat-hotel-detail">Profit: 39.7K · 68 txns</div>
+    </div>
+    <div class="cat-card" style="--cat-color:var(--purple)" onclick="filterByProduct('DQ Bookings')">
+      <div class="cat-dot"></div>
+      <div class="cat-name">DQ Bookings</div>
+      <div class="cat-val" id="cat-dq-val">21.6K</div>
+      <div class="cat-profit" id="cat-dq-detail">Profit: 3.5K · 16 txns</div>
+    </div>
+    <div class="cat-card" style="--cat-color:var(--red)" onclick="filterByProduct('Others')">
+      <div class="cat-dot"></div>
+      <div class="cat-name">Others</div>
+      <div class="cat-val" id="cat-others-val">237K</div>
+      <div class="cat-profit" id="cat-others-detail">Profit: 72.2K · 713 txns</div>
+    </div>
+    <div class="cat-card" style="--cat-color:var(--green)" onclick="filterByProduct('Tour Package')">
+      <div class="cat-dot"></div>
+      <div class="cat-name">Tour Package</div>
+      <div class="cat-val" id="cat-tour-val">263K</div>
+      <div class="cat-profit" id="cat-tour-detail">Profit: 69K · 36 txns</div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="charts-row cols-21">
+    <div class="chart-card tall">
+      <div class="chart-header">
+        <div><div class="chart-title">Monthly Revenue & Profit Trend</div>
+          <div class="chart-subtitle">Sales vs Cost vs Profit — Jan to Jul 2025</div></div>
+        <div class="chart-badge" id="trend-badge">7 Months</div>
+      </div>
+      <canvas id="c-monthly-trend"></canvas>
+    </div>
+    <div class="chart-card tall">
+      <div class="chart-header">
+        <div><div class="chart-title">Revenue by Category</div>
+          <div class="chart-subtitle">Share of total sales</div></div>
+      </div>
+      <canvas id="c-cat-donut"></canvas>
+    </div>
+  </div>
+
+  <!-- Charts Row 2 -->
+  <div class="charts-row cols-3">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Monthly Transactions</div>
+          <div class="chart-subtitle">Booking count per month</div></div>
+      </div>
+      <canvas id="c-txns-bar"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Profit Margin Trend</div>
+          <div class="chart-subtitle">% margin per month</div></div>
+      </div>
+      <canvas id="c-margin-line"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Profit by Category</div>
+          <div class="chart-subtitle">Comparative profit split</div></div>
+      </div>
+      <canvas id="c-profit-cat-bar"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- CATEGORY PAGES (JS renders each)       -->
+<!-- ════════════════════════════════════════ -->
+<div id="page-corp" style="flex:1;overflow:auto;padding:16px 20px;display:none"></div>
+<div id="page-dq" style="flex:1;overflow:auto;padding:16px 20px;display:none"></div>
+<div id="page-general" style="flex:1;overflow:auto;padding:16px 20px;display:none"></div>
+<div id="page-hotel" style="flex:1;overflow:auto;padding:16px 20px;display:none"></div>
+<div id="page-others" style="flex:1;overflow:auto;padding:16px 20px;display:none"></div>
+<div id="page-tour" style="flex:1;overflow:auto;padding:16px 20px;display:none"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const DATA = {
+  "__summary__": {
+    "total_sell":3962673,"total_cost":3567174,"total_profit":395814,
+    "total_txns":3079,"total_gds":2214,"profit_pct":9.99,
+    "monthly":{
+      "labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      "sell":[633827,669448,701936,608793,644449,489568,214652,0,0,0,0,0],
+      "cost":[556831,616032,633391,535153,586139,440881,198747,0,0,0,0,0],
+      "profit":[77309,53418,68545,73640,58310,48687,15905,0,0,0,0,0],
+      "txns":[516,480,525,499,501,405,153,0,0,0,0,0],
+      "gds":[399,361,468,377,349,183,77,0,0,0,0,0]
+    },
+    "by_category":[
+      {"name":"Corporate Ticket","sell":1287105,"profit":96068,"txns":957},
+      {"name":"General Ticket","sell":1846614,"profit":115251,"txns":1289},
+      {"name":"Hotel TP Sales","sell":306580,"profit":39701,"txns":68},
+      {"name":"DQ Bookings","sell":21615,"profit":3519,"txns":16},
+      {"name":"Others","sell":237204,"profit":72220,"txns":713},
+      {"name":"Tour Package","sell":263556,"profit":69054,"txns":36}
+    ]
+  },
+  "Corporate Ticket":{
+    "total_sell":1287105,"total_cost":1191037,"total_profit":96068,"total_txns":957,"total_gds":1338,
+    "monthly":{"labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      "sell":[214329,202720,218040,189745,203570,176160,82541,0,0,0,0,0],
+      "cost":[202019,189280,202530,177380,189975,162135,67718,0,0,0,0,0],
+      "profit":[12623,13276,15510,12365,13595,14025,6674,0,0,0,0,0],
+      "txns":[156,138,165,151,157,119,71,0,0,0,0,0]},
+    "staff":[
+      {"name":"WASEEM","sell":525480,"profit":39126,"txns":390},
+      {"name":"NIYAS","sell":301240,"profit":22458,"txns":224},
+      {"name":"ASHIQUE","sell":198520,"profit":14789,"txns":148},
+      {"name":"AJI","sell":157230,"profit":11715,"txns":117},
+      {"name":"MUSTAFA","sell":104635,"profit":7980,"txns":78}
+    ],
+    "customers":[
+      {"name":"CEPROTECH","sell":263770,"profit":20392,"txns":214},
+      {"name":"APOGEE","sell":104225,"profit":7847,"txns":77},
+      {"name":"LEXUS TAILORING","sell":91050,"profit":6554,"txns":60},
+      {"name":"JOINT POWER","sell":78340,"profit":5820,"txns":52},
+      {"name":"TUV","sell":62140,"profit":4718,"txns":45},
+      {"name":"SERVICO","sell":54230,"profit":4110,"txns":40},
+      {"name":"HORIZON","sell":43120,"profit":3210,"txns":32},
+      {"name":"SYSCO","sell":38490,"profit":2870,"txns":28}
+    ],
+    "suppliers":[
+      {"name":"SATGURU","sell":643220,"profit":47826,"txns":493},
+      {"name":"NBK","sell":496475,"profit":33880,"txns":299},
+      {"name":"INDIGO","sell":71530,"profit":6856,"txns":74},
+      {"name":"AIR ARABIA","sell":56120,"profit":4310,"txns":56},
+      {"name":"QATAR AIRWAYS","sell":19760,"profit":3196,"txns":35}
+    ],
+    "gds":[
+      {"name":"GALILEO","segs":818,"txns":522},
+      {"name":"6E ONLINE","segs":1,"txns":46},
+      {"name":"G9 ONLINE","segs":0,"txns":7},
+      {"name":"IX ONLINE","segs":1,"txns":24},
+      {"name":"FZ ONLINE","segs":0,"txns":6}
+    ],
+    "carriers":[
+      {"name":"QR","sell":408875,"profit":26326,"txns":194},
+      {"name":"6E","sell":174110,"profit":15914,"txns":169},
+      {"name":"IX","sell":136265,"profit":9826,"txns":121},
+      {"name":"H9","sell":94930,"profit":6121,"txns":76},
+      {"name":"AI","sell":74930,"profit":5554,"txns":70},
+      {"name":"G9","sell":64410,"profit":4890,"txns":62},
+      {"name":"FZ","sell":42230,"profit":3180,"txns":41},
+      {"name":"EK","sell":32355,"profit":2257,"txns":28}
+    ]
+  },
+  "DQ Bookings":{
+    "total_sell":21615,"total_cost":18096,"total_profit":3519,"total_txns":16,"total_gds":0,
+    "monthly":{"labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      "sell":[4730,2100,5460,2890,3640,2795,0,0,0,0,0,0],
+      "cost":[3840,1760,4560,2400,3100,2436,0,0,0,0,0,0],
+      "profit":[890,340,900,490,540,359,0,0,0,0,0,0],
+      "txns":[3,2,4,2,3,2,0,0,0,0,0,0]},
+    "staff":[
+      {"name":"NIYAS","sell":9870,"profit":1620,"txns":7},
+      {"name":"WASEEM","sell":7240,"profit":1189,"txns":5},
+      {"name":"ASHIQUE","sell":4505,"profit":710,"txns":4}
+    ],
+    "customers":[
+      {"name":"SKYLEX","sell":5680,"profit":940,"txns":4},
+      {"name":"SERVICO","sell":4320,"profit":710,"txns":3},
+      {"name":"WALKIN","sell":3840,"profit":630,"txns":3},
+      {"name":"APOGEE","sell":3210,"profit":527,"txns":2},
+      {"name":"CEPROTECH","sell":2540,"profit":415,"txns":2},
+      {"name":"JOINT POWER","sell":2025,"profit":297,"txns":2}
+    ],
+    "suppliers":[],"gds":[],"carriers":[]
+  },
+  "General Ticket":{
+    "total_sell":1846614,"total_cost":1731677,"total_profit":115251,"total_txns":1289,"total_gds":876,
+    "monthly":{"labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      "sell":[272640,298760,310480,265830,281960,237940,179004,0,0,0,0,0],
+      "cost":[255380,279620,290740,248960,264180,222370,170427,0,0,0,0,0],
+      "profit":[17260,19140,19740,16870,17780,15570,8577,0,0,0,0,0],
+      "txns":[198,182,210,190,197,178,134,0,0,0,0,0]},
+    "staff":[
+      {"name":"WASEEM","sell":805333,"profit":53330,"txns":510},
+      {"name":"NIYAS","sell":415264,"profit":24588,"txns":283},
+      {"name":"ASHIQUE","sell":214385,"profit":12540,"txns":156},
+      {"name":"AJI","sell":189462,"profit":11290,"txns":138},
+      {"name":"MUSTAFA","sell":112170,"profit":7503,"txns":85},
+      {"name":"FAISAL","sell":110000,"profit":6000,"txns":117}
+    ],
+    "customers":[
+      {"name":"WALKIN","sell":420560,"profit":24890,"txns":298},
+      {"name":"STAFF","sell":198340,"profit":11260,"txns":142},
+      {"name":"GTT","sell":175840,"profit":10120,"txns":124},
+      {"name":"SPIRIT EVENTS","sell":142380,"profit":8140,"txns":98},
+      {"name":"ETC","sell":118920,"profit":6780,"txns":84},
+      {"name":"MOH RISMIN","sell":95640,"profit":5480,"txns":64},
+      {"name":"C/O NIYAS","sell":82340,"profit":4720,"txns":58},
+      {"name":"APOGEE","sell":61250,"profit":3540,"txns":42}
+    ],
+    "suppliers":[
+      {"name":"SATGURU","sell":820460,"profit":54340,"txns":620},
+      {"name":"NBK","sell":410230,"profit":27180,"txns":310},
+      {"name":"INDIGO","sell":185640,"profit":12340,"txns":148},
+      {"name":"AIR ARABIA","sell":142380,"profit":9560,"txns":112},
+      {"name":"AIR INDIA EXPRESS","sell":95640,"profit":6380,"txns":78},
+      {"name":"FLYNAS","sell":62340,"profit":4120,"txns":48},
+      {"name":"FLYDUBAI","sell":49820,"profit":3280,"txns":38},
+      {"name":"SPICEJET","sell":39120,"profit":2580,"txns":28}
+    ],
+    "gds":[
+      {"name":"GALILEO","segs":540,"txns":340},
+      {"name":"6E ONLINE","segs":90,"txns":90},
+      {"name":"IX ONLINE","segs":120,"txns":120},
+      {"name":"G9 ONLINE","segs":70,"txns":70},
+      {"name":"FZ ONLINE","segs":56,"txns":56}
+    ],
+    "carriers":[
+      {"name":"QR","sell":520450,"profit":34290,"txns":248},
+      {"name":"6E","sell":385620,"profit":25490,"txns":290},
+      {"name":"IX","sell":285430,"profit":18930,"txns":218},
+      {"name":"AI","sell":198450,"profit":13190,"txns":148},
+      {"name":"G9","sell":162340,"profit":10810,"txns":124},
+      {"name":"FZ","sell":124380,"profit":8240,"txns":98},
+      {"name":"EK","sell":98360,"profit":6530,"txns":74},
+      {"name":"H9","sell":71584,"profit":7771,"txns":89}
+    ]
+  },
+  "Hotel TP Sales":{
+    "total_sell":306580,"total_cost":266878,"total_profit":39701,"total_txns":68,"total_gds":0,
+    "monthly":{"labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      "sell":[54280,62340,68920,51640,44380,25020,0,0,0,0,0,0],
+      "cost":[46200,53280,59640,44820,38560,21760,2618,0,0,0,0,0],
+      "profit":[8080,9060,9280,6820,5820,3260,1381,0,0,0,0,0],
+      "txns":[13,14,16,10,9,6,0,0,0,0,0,0]},
+    "staff":[
+      {"name":"ASHIQUE","sell":138640,"profit":18210,"txns":31},
+      {"name":"NIYAS","sell":96480,"profit":12480,"txns":21},
+      {"name":"WASEEM","sell":71460,"profit":9011,"txns":16}
+    ],
+    "customers":[
+      {"name":"WALK IN","sell":98420,"profit":12840,"txns":22},
+      {"name":"MR HARIKRISHNAN","sell":54280,"profit":7120,"txns":12},
+      {"name":"GTT","sell":42380,"profit":5540,"txns":9},
+      {"name":"CEPROTECH","sell":38140,"profit":4980,"txns":8},
+      {"name":"APOGEE","sell":29420,"profit":3840,"txns":6},
+      {"name":"LEXUS TAILORING","sell":25040,"profit":3262,"txns":5},
+      {"name":"JOINT POWER","sell":18900,"profit":2119,"txns":6}
+    ],
+    "suppliers":[
+      {"name":"TBO HOLIDAYS","sell":167280,"profit":20651,"txns":47},
+      {"name":"TRIP N STAY","sell":86380,"profit":8569,"txns":14},
+      {"name":"CAPITAL","sell":21520,"profit":5247,"txns":4},
+      {"name":"DNATA","sell":18400,"profit":3234,"txns":3},
+      {"name":"HOTELBEDS","sell":13000,"profit":2000,"txns":2}
+    ],
+    "gds":[],"carriers":[]
+  },
+  "Others":{
+    "total_sell":237204,"total_cost":164984,"total_profit":72220,"total_txns":713,"total_gds":0,
+    "monthly":{"labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      "sell":[54280,56340,56180,52640,56240,48760,12764,0,0,0,0,0],
+      "cost":[37580,39120,38960,36480,39040,33960,8844,0,0,0,0,0],
+      "profit":[16700,17220,17220,16160,17200,14800,3920,0,0,0,0,0],
+      "txns":[108,105,110,100,103,98,89,0,0,0,0,0]},
+    "staff":[
+      {"name":"ASHIQUE","sell":98560,"profit":30120,"txns":296},
+      {"name":"NIYAS","sell":72340,"profit":21960,"txns":217},
+      {"name":"AJI","sell":46840,"profit":14180,"txns":140},
+      {"name":"WASEEM","sell":19464,"profit":5960,"txns":60}
+    ],
+    "customers":[
+      {"name":"WALKIN","sell":68940,"profit":21060,"txns":207},
+      {"name":"CEPROTECH","sell":42380,"profit":12920,"txns":127},
+      {"name":"APOGEE","sell":34120,"profit":10420,"txns":102},
+      {"name":"GTT","sell":27840,"profit":8500,"txns":83},
+      {"name":"LEXUS TAILORING","sell":22640,"profit":6920,"txns":68},
+      {"name":"JOINT POWER","sell":18340,"profit":5620,"txns":55},
+      {"name":"SPIRIT EVENTS","sell":14740,"profit":4520,"txns":44},
+      {"name":"ETC","sell":8206,"profit":2260,"txns":27}
+    ],
+    "suppliers":[
+      {"name":"SATGURU","sell":81422,"profit":20250,"txns":236},
+      {"name":"ONLINE","sell":42836,"profit":14102,"txns":79},
+      {"name":"MOFA","sell":31420,"profit":10560,"txns":94},
+      {"name":"ONLINE TKT SERVICE","sell":24560,"profit":8240,"txns":72},
+      {"name":"TRAVEL HOUSE","sell":18960,"profit":6380,"txns":58},
+      {"name":"OFFICE CORP CARD","sell":22085,"profit":7072,"txns":51},
+      {"name":"VISA FACILITATION","sell":16020,"profit":5116,"txns":48},
+      {"name":"EMBASSY","sell":9901,"profit":1500,"txns":75}
+    ],
+    "gds":[],"carriers":[]
+  },
+  "Tour Package":{
+    "total_sell":263556,"total_cost":194503,"total_profit":69054,"total_txns":36,"total_gds":0,
+    "monthly":{"labels":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      "sell":[34098,47988,42856,46048,58639,16930,16997,0,0,0,0,0],
+      "cost":[24432,35672,31401,33113,42284,15656,12045,0,0,0,0,0],
+      "profit":[9666,12316,11455,12935,16355,1274,4952,0,0,0,0,0],
+      "txns":[4,7,8,5,5,4,3,0,0,0,0,0]},
+    "staff":[
+      {"name":"ASHIQUE","sell":112380,"profit":29480,"txns":15},
+      {"name":"AJI","sell":98240,"profit":25760,"txns":13},
+      {"name":"NIYAS","sell":52936,"profit":13814,"txns":8}
+    ],
+    "customers":[
+      {"name":"SPIRIT EVENTS","sell":68420,"profit":18160,"txns":9},
+      {"name":"MOH RISMIN","sell":52380,"profit":13840,"txns":7},
+      {"name":"ETC","sell":42340,"profit":11180,"txns":5},
+      {"name":"GTT","sell":35780,"profit":9460,"txns":5},
+      {"name":"WALKIN","sell":28940,"profit":7640,"txns":4},
+      {"name":"CEPROTECH","sell":19840,"profit":5240,"txns":3},
+      {"name":"C/O NIYAS","sell":15856,"profit":4534,"txns":3}
+    ],
+    "suppliers":[
+      {"name":"SITA INDIA","sell":67200,"profit":17070,"txns":3},
+      {"name":"LEMONTREE(PBD EXP)","sell":49700,"profit":26677,"txns":10},
+      {"name":"UMBRELLA TRAVEL","sell":47840,"profit":9460,"txns":5},
+      {"name":"GUIDE OF GEORGIA","sell":38560,"profit":8940,"txns":4},
+      {"name":"INDIA TOURS","sell":32140,"profit":5540,"txns":4},
+      {"name":"ARABIAN ADVENTURES","sell":28116,"profit":1367,"txns":10}
+    ],
+    "gds":[],"carriers":[]
+  }
+};
+
+// ── CONFIG ─────────────────────────────────────────────────────────────
+const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const CAT_COLORS = {
+  "Corporate Ticket":"#3b82f6",
+  "General Ticket":"#14b8a6",
+  "Hotel TP Sales":"#f59e0b",
+  "DQ Bookings":"#8b5cf6",
+  "Others":"#ef4444",
+  "Tour Package":"#10b981"
+};
+
+const PALETTE = [
+  "#3b82f6","#10b981","#f59e0b","#ef4444","#8b5cf6",
+  "#14b8a6","#f97316","#06b6d4","#84cc16","#ec4899"
+];
+
+const PAGE_MAP = {
+  "Corporate Ticket":"corp","General Ticket":"general",
+  "Hotel TP Sales":"hotel","DQ Bookings":"dq",
+  "Others":"others","Tour Package":"tour"
+};
+
+const CHART_DEFAULTS = {
+  responsive:true, maintainAspectRatio:true,
+  plugins:{legend:{display:false},tooltip:{
+    backgroundColor:'rgba(26,32,44,0.95)',
+    titleColor:'#1a202c',bodyColor:'#4a5568',
+    borderColor:'#e2e8f0',borderWidth:1,padding:10,
+    callbacks:{label:ctx=>' '+fmt(ctx.parsed.y||ctx.parsed||0)}
+  }},
+  scales:{
+    x:{grid:{color:'#f1f5f9'},ticks:{color:'#718096',font:{size:10}}},
+    y:{grid:{color:'#f1f5f9'},ticks:{color:'#718096',font:{size:10},
+       callback:v=>v>=1000000?'Q'+(v/1000000).toFixed(1)+'M':v>=1000?'Q'+(v/1000).toFixed(0)+'K':'Q'+v}}
+  }
+};
+
+function fmt(n){
+  if(n>=1000000) return 'QAR '+(n/1000000).toFixed(2)+'M';
+  if(n>=1000) return 'QAR '+(n/1000).toFixed(1)+'K';
+  return 'QAR '+n.toLocaleString();
+}
+function fmtK(n){
+  if(n>=1000000) return (n/1000000).toFixed(2)+'M';
+  if(n>=1000) return (n/1000).toFixed(1)+'K';
+  return n.toLocaleString();
+}
+function pct(a,b){return b?((a/b)*100).toFixed(1)+'%':'—'}
+
+const charts = {};
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id]}}
+
+function mkChart(id, config){
+  destroyChart(id);
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  charts[id] = new Chart(ctx, config);
+  return charts[id];
+}
+
+// ── FILTER STATE ──────────────────────────────────────────────────────
+let activeFilters = {month:'', product:'', staff:''};
+
+function getMonthIdx(monthName){
+  return MONTHS_FULL.findIndex(m=>m===monthName);
+}
+
+function applyFilters(){
+  activeFilters.month = document.getElementById('f-month').value;
+  activeFilters.product = document.getElementById('f-product').value;
+  activeFilters.staff = document.getElementById('f-staff').value;
+
+  // Update filter active tag
+  const hasFilter = activeFilters.month || activeFilters.product || activeFilters.staff;
+  const tag = document.getElementById('filter-active-tag');
+  if(hasFilter){
+    tag.classList.add('visible');
+    const parts = [];
+    if(activeFilters.month) parts.push(activeFilters.month);
+    if(activeFilters.product) parts.push(activeFilters.product);
+    if(activeFilters.staff) parts.push(activeFilters.staff);
+    document.getElementById('filter-active-text').textContent = parts.join(' · ');
+  } else {
+    tag.classList.remove('visible');
+  }
+
+  // Re-render current page with filters
+  const page = currentPage;
+  rendered[page] = false; // force re-render
+  renderPage(page);
+  if(page === 'summary') updateSummaryWithFilters();
+}
+
+function resetFilters(){
+  document.getElementById('f-month').value = '';
+  document.getElementById('f-product').value = '';
+  document.getElementById('f-staff').value = '';
+  activeFilters = {month:'', product:'', staff:''};
+  document.getElementById('filter-active-tag').classList.remove('visible');
+  const page = currentPage;
+  rendered[page] = false;
+  renderPage(page);
+  if(page === 'summary') updateSummaryWithFilters();
+}
+
+function filterByProduct(productName){
+  document.getElementById('f-product').value = productName;
+  applyFilters();
+  // Navigate to the product page
+  const pageKey = PAGE_MAP[productName];
+  if(pageKey) showPage(pageKey);
+}
+
+// ── FILTER LOGIC HELPERS ───────────────────────────────────────────────
+function getFilteredData(catName){
+  const d = DATA[catName];
+  if(!d) return null;
+
+  const {month, staff} = activeFilters;
+
+  // Month filter: slice monthly arrays to just that month
+  let monthIdx = -1;
+  if(month){
+    monthIdx = MONTHS_FULL.indexOf(month);
+  }
+
+  // Build filtered monthly
+  let filteredMonthly;
+  if(monthIdx >= 0){
+    filteredMonthly = {
+      labels: [MONTHS_SHORT[monthIdx]],
+      sell: [d.monthly.sell[monthIdx] || 0],
+      cost: [d.monthly.cost[monthIdx] || 0],
+      profit: [d.monthly.profit[monthIdx] || 0],
+      txns: [d.monthly.txns[monthIdx] || 0]
+    };
+  } else {
+    const activeM = d.monthly.sell.filter(v=>v>0).length || 7;
+    filteredMonthly = {
+      labels: d.monthly.labels.slice(0, activeM),
+      sell: d.monthly.sell.slice(0, activeM),
+      cost: d.monthly.cost.slice(0, activeM),
+      profit: d.monthly.profit.slice(0, activeM),
+      txns: d.monthly.txns.slice(0, activeM)
+    };
+  }
+
+  // Staff filter: filter staff array, recompute totals proportionally
+  let staffData = d.staff;
+  let staffFraction = 1;
+  if(staff && staff !== ''){
+    const staffItem = d.staff.find(s=>s.name===staff);
+    if(staffItem){
+      staffData = [staffItem];
+      staffFraction = d.total_sell > 0 ? staffItem.sell / d.total_sell : 1;
+    } else {
+      // Staff not in this category
+      return null;
+    }
+  }
+
+  // Compute totals
+  const totalSell = filteredMonthly.sell.reduce((a,b)=>a+b,0);
+  const totalCost = filteredMonthly.cost.reduce((a,b)=>a+b,0);
+  const totalProfit = filteredMonthly.profit.reduce((a,b)=>a+b,0);
+  const totalTxns = filteredMonthly.txns.reduce((a,b)=>a+b,0);
+
+  // If staff filter active, scale totals
+  const scaledSell = staff ? totalSell * staffFraction : totalSell;
+  const scaledCost = staff ? totalCost * staffFraction : totalCost;
+  const scaledProfit = staff ? totalProfit * staffFraction : totalProfit;
+  const scaledTxns = staff ? Math.round(totalTxns * staffFraction) : totalTxns;
+
+  return {
+    ...d,
+    total_sell: scaledSell,
+    total_cost: scaledCost,
+    total_profit: scaledProfit,
+    total_txns: scaledTxns,
+    monthly: filteredMonthly,
+    staff: staffData
+  };
+}
+
+function getSummaryFilteredData(){
+  const {month, product, staff} = activeFilters;
+
+  // Determine which categories to include
+  let cats = DATA.__summary__.by_category;
+  if(product){
+    cats = cats.filter(c=>c.name===product);
+  }
+
+  let totalSell = 0, totalProfit = 0, totalTxns = 0, totalGds = 0;
+
+  // Build monthly aggregates
+  const monthlyLen = 12;
+  const sell = new Array(monthlyLen).fill(0);
+  const cost = new Array(monthlyLen).fill(0);
+  const profit = new Array(monthlyLen).fill(0);
+  const txns = new Array(monthlyLen).fill(0);
+
+  cats.forEach(cat=>{
+    const d = DATA[cat.name];
+    if(!d) return;
+
+    // Staff fraction
+    let staffFraction = 1;
+    if(staff){
+      const staffItem = d.staff.find(s=>s.name===staff);
+      if(!staffItem) return;
+      staffFraction = d.total_sell > 0 ? staffItem.sell / d.total_sell : 0;
+    }
+
+    for(let i=0;i<monthlyLen;i++){
+      sell[i] += (d.monthly.sell[i]||0) * staffFraction;
+      cost[i] += (d.monthly.cost[i]||0) * staffFraction;
+      profit[i] += (d.monthly.profit[i]||0) * staffFraction;
+      txns[i] += (d.monthly.txns[i]||0) * staffFraction;
+    }
+    totalSell += d.total_sell * staffFraction;
+    totalProfit += d.total_profit * staffFraction;
+    totalTxns += d.total_txns * staffFraction;
+    totalGds += (d.total_gds||0) * staffFraction;
+  });
+
+  // Apply month filter
+  let mSell, mCost, mProfit, mTxns, mLabels;
+  if(month){
+    const idx = MONTHS_FULL.indexOf(month);
+    mLabels = [MONTHS_SHORT[idx]];
+    mSell = [sell[idx]]; mCost = [cost[idx]];
+    mProfit = [profit[idx]]; mTxns = [txns[idx]];
+    totalSell = sell[idx]; totalProfit = profit[idx]; totalTxns = txns[idx];
+  } else {
+    const activeM = DATA.__summary__.monthly.sell.filter(v=>v>0).length || 7;
+    mLabels = MONTHS_SHORT.slice(0,activeM);
+    mSell = sell.slice(0,activeM);
+    mCost = cost.slice(0,activeM);
+    mProfit = profit.slice(0,activeM);
+    mTxns = txns.slice(0,activeM);
+  }
+
+  return {
+    total_sell: totalSell,
+    total_profit: totalProfit,
+    total_txns: Math.round(totalTxns),
+    total_gds: Math.round(totalGds),
+    monthly: {labels:mLabels, sell:mSell, cost:mCost, profit:mProfit, txns:mTxns}
+  };
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────
+const PAGES = ['summary','corp','dq','general','hotel','others','tour'];
+let currentPage = 'summary';
+const rendered = {summary:false};
+
+function showPage(page){
+  currentPage = page;
+  PAGES.forEach(p=>{
+    const el = document.getElementById('page-'+p);
+    if(el) el.style.display = p===page?'block':'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{
+    t.classList.toggle('active', PAGES[i]===page);
+  });
+  if(!rendered[page]){
+    rendered[page]=true;
+    setTimeout(()=>renderPage(page),50);
+  }
+}
+
+// ── SUMMARY PAGE ────────────────────────────────────────────────────────
+function updateSummaryWithFilters(){
+  const {month, product, staff} = activeFilters;
+  const hasFilter = month || product || staff;
+
+  // Status bar
+  const statusBar = document.getElementById('summary-filter-status');
+  if(hasFilter){
+    const parts=[];
+    if(month) parts.push('Month: '+month);
+    if(product) parts.push('Product: '+product);
+    if(staff) parts.push('Staff: '+staff);
+    document.getElementById('summary-filter-text').textContent = parts.join(' · ');
+    statusBar.classList.add('visible');
+  } else {
+    statusBar.classList.remove('visible');
+  }
+
+  const fd = getSummaryFilteredData();
+  const margin = fd.total_sell > 0 ? (fd.total_profit/fd.total_sell*100).toFixed(2) : '0.00';
+
+  // Update KPI values
+  document.getElementById('kpi-revenue').textContent = fmtK(fd.total_sell);
+  document.getElementById('kpi-profit').textContent = fmtK(fd.total_profit);
+  document.getElementById('kpi-margin').textContent = margin+'%';
+  document.getElementById('kpi-txns').textContent = fd.total_txns.toLocaleString();
+  document.getElementById('kpi-gds').textContent = Math.round(fd.total_gds).toLocaleString();
+
+  const activeMonths = fd.monthly.labels.length;
+  document.getElementById('trend-badge').textContent = month ? '1 Month' : activeMonths+' Months';
+
+  // Rebuild charts
+  renderSummaryCharts(fd, hasFilter);
+}
+
+function renderSummaryCharts(fd, hasFilter){
+  const sm = fd.monthly;
+  const activeMonths = sm.labels.length;
+  const baseData = hasFilter ? fd : DATA.__summary__;
+
+  // Monthly trend
+  mkChart('c-monthly-trend',{
+    type:'bar',
+    data:{
+      labels:sm.labels,
+      datasets:[
+        {label:'Revenue',data:sm.sell,
+         backgroundColor:'rgba(59,130,246,0.6)',borderColor:'#3b82f6',borderWidth:1,
+         borderRadius:4,yAxisID:'y'},
+        {label:'Cost',data:sm.cost,
+         backgroundColor:'rgba(239,68,68,0.3)',borderColor:'#ef4444',borderWidth:1,
+         borderRadius:4,yAxisID:'y'},
+        {label:'Profit',data:sm.profit,
+         type:'line',borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.08)',
+         borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#10b981',fill:true,yAxisID:'y'}
+      ]
+    },
+    options:{...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins,legend:{
+      display:true,position:'bottom',
+      labels:{color:'#718096',font:{size:10},boxWidth:12,padding:12}
+    }}}
+  });
+
+  // Category donut — always show all categories for context, highlight filtered
+  const cats = DATA.__summary__.by_category;
+  const filteredProduct = activeFilters.product;
+  mkChart('c-cat-donut',{
+    type:'doughnut',
+    data:{
+      labels:cats.map(c=>c.name),
+      datasets:[{data:cats.map(c=>c.sell),
+        backgroundColor:cats.map(c=>{
+          const col = CAT_COLORS[c.name]||'#555';
+          if(filteredProduct && c.name!==filteredProduct) return col+'44';
+          return col;
+        }),
+        borderColor:'#ffffff',borderWidth:3,hoverOffset:6}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,cutout:'68%',
+      plugins:{
+        legend:{display:true,position:'bottom',
+          labels:{color:'#718096',font:{size:10},boxWidth:10,padding:8}},
+        tooltip:{callbacks:{label:ctx=>' '+fmtK(ctx.parsed)+' QAR'}}
+      }
+    }
+  });
+
+  // Transactions bar
+  mkChart('c-txns-bar',{
+    type:'bar',
+    data:{labels:sm.labels,
+      datasets:[{label:'Transactions',data:sm.txns,
+        backgroundColor:sm.txns.map((_,i)=>PALETTE[i%PALETTE.length]+'bb'),
+        borderRadius:4}]},
+    options:{...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins},
+      scales:{...CHART_DEFAULTS.scales,y:{...CHART_DEFAULTS.scales.y,
+        ticks:{color:'#718096',font:{size:10}}}}}
+  });
+
+  // Margin line
+  const margins = sm.sell.map((s,i)=>s?+(sm.profit[i]/s*100).toFixed(2):0);
+  mkChart('c-margin-line',{
+    type:'line',
+    data:{labels:sm.labels,
+      datasets:[{label:'Profit %',data:margins,
+        borderColor:'#14b8a6',backgroundColor:'rgba(20,184,166,0.08)',
+        borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#14b8a6',fill:true}]},
+    options:{...CHART_DEFAULTS,
+      scales:{...CHART_DEFAULTS.scales,y:{...CHART_DEFAULTS.scales.y,
+        ticks:{color:'#718096',font:{size:10},callback:v=>v+'%'}}},
+      plugins:{...CHART_DEFAULTS.plugins,tooltip:{
+        ...CHART_DEFAULTS.plugins.tooltip,
+        callbacks:{label:ctx=>' Margin: '+ctx.parsed.y+'%'}
+      }}}
+  });
+
+  // Profit by category bar (filtered if product selected)
+  const profitCats = filteredProduct
+    ? cats.filter(c=>c.name===filteredProduct)
+    : cats;
+  mkChart('c-profit-cat-bar',{
+    type:'bar',
+    data:{
+      labels:profitCats.map(c=>c.name.replace(' Ticket','').replace(' Sales','')),
+      datasets:[{label:'Profit',data:profitCats.map(c=>c.profit),
+        backgroundColor:profitCats.map(c=>CAT_COLORS[c.name]),borderRadius:4}]},
+    options:{...CHART_DEFAULTS,indexAxis:'y',
+      scales:{
+        x:{grid:{color:'#f1f5f9'},ticks:{color:'#718096',font:{size:10},
+           callback:v=>'Q'+fmtK(v)}},
+        y:{grid:{display:false},ticks:{color:'#718096',font:{size:10}}}
+      }}
+  });
+}
+
+function renderSummary(){
+  updateSummaryWithFilters();
+}
+
+// ── CATEGORY PAGE RENDERER ─────────────────────────────────────────────
+function renderPage(page){
+  if(page==='summary'){renderSummary();return;}
+
+  const catMap = {corp:'Corporate Ticket',dq:'DQ Bookings',general:'General Ticket',
+                  hotel:'Hotel TP Sales',others:'Others',tour:'Tour Package'};
+  const catName = catMap[page];
+
+  // Check product filter: if filtering to a different product, show empty
+  if(activeFilters.product && activeFilters.product !== catName){
+    const el = document.getElementById('page-'+page);
+    el.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:60%;flex-direction:column;gap:12px">
+      <div style="font-size:48px">🔍</div>
+      <div style="font-family:'Plus Jakarta Sans','Inter',sans-serif;font-size:16px;font-weight:700;color:var(--text-muted)">Filter active for ${activeFilters.product}</div>
+      <div style="color:var(--text-muted);font-size:12px">Reset the product filter to view this category</div>
+      <button onclick="resetFilters()" style="background:var(--blue);color:#fff;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600">Reset Filters</button>
+    </div>`;
+    return;
+  }
+
+  // Get filtered data for this category
+  const fd = getFilteredData(catName);
+  if(!fd){
+    const el = document.getElementById('page-'+page);
+    el.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:60%;flex-direction:column;gap:12px">
+      <div style="font-size:48px">👤</div>
+      <div style="font-family:'Plus Jakarta Sans','Inter',sans-serif;font-size:16px;font-weight:700;color:var(--text-muted)">Staff "${activeFilters.staff}" not found in ${catName}</div>
+      <button onclick="resetFilters()" style="background:var(--blue);color:#fff;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600">Reset Filters</button>
+    </div>`;
+    return;
+  }
+
+  const col = CAT_COLORS[catName];
+  const el = document.getElementById('page-'+page);
+  const profPct = fd.total_sell ? (fd.total_profit/fd.total_sell*100).toFixed(2) : 0;
+  const hasFilter = activeFilters.month || activeFilters.staff;
+  const filterNote = hasFilter ? ` (${[activeFilters.month,activeFilters.staff].filter(Boolean).join(', ')})` : '';
+
+  el.innerHTML = `
+  ${hasFilter ? `<div style="display:flex;align-items:center;gap:8px;background:var(--blue-light);border:1px solid var(--blue);border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:11px;color:var(--blue-dark);font-weight:600">
+    🔍 Filtered view${filterNote} &nbsp;<button onclick="resetFilters()" style="background:var(--blue);color:#fff;border:none;padding:2px 10px;border-radius:20px;cursor:pointer;font-size:10px;font-weight:600;margin-left:auto">Reset</button>
+  </div>` : ''}
+
+  <div class="page-header">
+    <div>
+      <div class="page-title" style="color:${col}">${catName}</div>
+      <div class="page-desc">Performance analysis — 2025${filterNote} &nbsp;·&nbsp; All figures in QAR</div>
+    </div>
+    <div class="page-kpis">
+      <div class="inline-kpi">
+        <div class="inline-kpi-label">Total Revenue</div>
+        <div class="inline-kpi-val" style="color:${col}">${fmtK(fd.total_sell)}</div>
+      </div>
+      <div class="inline-kpi">
+        <div class="inline-kpi-label">Total Profit</div>
+        <div class="inline-kpi-val" style="color:var(--green)">${fmtK(fd.total_profit)}</div>
+      </div>
+      <div class="inline-kpi">
+        <div class="inline-kpi-label">Margin</div>
+        <div class="inline-kpi-val" style="color:var(--orange)">${profPct}%</div>
+      </div>
+      <div class="inline-kpi">
+        <div class="inline-kpi-label">Transactions</div>
+        <div class="inline-kpi-val" style="color:var(--purple)">${fd.total_txns.toLocaleString()}</div>
+      </div>
+      ${fd.total_gds>0?`<div class="inline-kpi">
+        <div class="inline-kpi-label">GDS Segments</div>
+        <div class="inline-kpi-val" style="color:var(--teal)">${fd.total_gds.toLocaleString()}</div>
+      </div>`:''}</div>
+  </div>
+
+  <!-- KPI mini cards -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
+    ${[
+      ['Revenue',fmtK(fd.total_sell),col,'linear-gradient(90deg,'+col+','+col+'aa)'],
+      ['Cost',fmtK(fd.total_cost),'var(--red)','linear-gradient(90deg,var(--red),#f87171)'],
+      ['Profit',fmtK(fd.total_profit),'var(--green)','linear-gradient(90deg,var(--green),#34d399)'],
+      ['Margin',profPct+'%','var(--orange)','linear-gradient(90deg,var(--orange),#fbbf24)'],
+    ].map(([l,v,c,grad])=>`
+    <div class="kpi-card" style="--accent-color:${grad};padding:12px 16px">
+      <div class="kpi-label">${l}</div>
+      <div class="kpi-value" style="font-size:18px;color:${c}">${v}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Row 1: Monthly trend + Margin -->
+  <div class="charts-row cols-21">
+    <div class="chart-card tall">
+      <div class="chart-header">
+        <div><div class="chart-title">Monthly Revenue, Cost & Profit</div>
+          <div class="chart-subtitle">Trend${filterNote}</div></div>
+        <div class="chart-badge">${fd.monthly.labels.length} Month${fd.monthly.labels.length>1?'s':''}</div>
+      </div>
+      <canvas id="${page}-monthly"></canvas>
+    </div>
+    <div class="chart-card tall">
+      <div class="chart-header">
+        <div><div class="chart-title">Monthly Profit Margin %</div>
+          <div class="chart-subtitle">Month-over-month margin</div></div>
+      </div>
+      <canvas id="${page}-margin"></canvas>
+    </div>
+  </div>
+
+  <!-- Row 2 -->
+  <div class="charts-row ${fd.carriers.length>0?'cols-3':'cols-2'}">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Monthly Transactions</div>
+          <div class="chart-subtitle">Booking count per month</div></div>
+      </div>
+      <canvas id="${page}-txns"></canvas>
+    </div>
+    ${fd.gds.length>0?`
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">GDS System Breakdown</div>
+          <div class="chart-subtitle">Segments by GDS platform</div></div>
+      </div>
+      <canvas id="${page}-gds"></canvas>
+    </div>`:fd.suppliers.length>0?`
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Top Suppliers by Revenue</div>
+          <div class="chart-subtitle">Supplier exposure analysis</div></div>
+      </div>
+      <canvas id="${page}-supp-bar"></canvas>
+    </div>`:''}
+    ${fd.carriers.length>0?`
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Carrier Performance</div>
+          <div class="chart-subtitle">Revenue by airline</div></div>
+      </div>
+      <canvas id="${page}-carrier"></canvas>
+    </div>`:''}
+  </div>
+
+  <!-- Row 3: Tables -->
+  <div class="charts-row cols-2">
+    ${fd.customers.length>0?`
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Top Customers</div>
+          <div class="chart-subtitle">By revenue — top ${Math.min(fd.customers.length,8)}</div></div>
+      </div>
+      <div class="progress-list" id="${page}-cust-bars"></div>
+    </div>`:''}
+    ${fd.staff.length>0?`
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Staff Performance</div>
+          <div class="chart-subtitle">Revenue & profit by staff</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="dash-table">
+          <thead><tr>
+            <th>#</th><th>Staff</th>
+            <th class="num">Revenue</th><th class="num">Profit</th>
+            <th class="num">Txns</th><th class="num">Margin</th>
+          </tr></thead>
+          <tbody>${fd.staff.map((s,i)=>`
+          <tr>
+            <td><span class="rank-badge ${i<3?'top3':''}">${i+1}</span></td>
+            <td><strong>${s.name}</strong></td>
+            <td class="num">${fmtK(s.sell)}</td>
+            <td class="num" style="color:var(--green)">${fmtK(s.profit)}</td>
+            <td class="num">${s.txns}</td>
+            <td class="num"><span class="profit-pill ${s.sell?(s.profit/s.sell*100)<5?'low':'':''}"">${pct(s.profit,s.sell)}</span></td>
+          </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`:''}
+  </div>
+
+  ${fd.suppliers.length>0?`
+  <!-- Supplier Table -->
+  <div class="charts-row" style="grid-template-columns:1fr">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Supplier Analysis</div>
+          <div class="chart-subtitle">Exposure by supplier — top ${fd.suppliers.length}</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="dash-table">
+          <thead><tr>
+            <th>#</th><th>Supplier</th>
+            <th class="num">Revenue</th><th class="num">Profit</th>
+            <th class="num">Txns</th><th class="num">Margin</th>
+            <th class="num">Share %</th>
+          </tr></thead>
+          <tbody>${fd.suppliers.map((s,i)=>`
+          <tr>
+            <td><span class="rank-badge ${i<3?'top3':''}">${i+1}</span></td>
+            <td><strong>${s.name}</strong></td>
+            <td class="num">${fmtK(s.sell)}</td>
+            <td class="num" style="color:var(--green)">${fmtK(s.profit)}</td>
+            <td class="num">${s.txns}</td>
+            <td class="num"><span class="profit-pill">${pct(s.profit,s.sell)}</span></td>
+            <td class="num">${pct(s.sell,DATA[catName].total_sell)}</td>
+          </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`:''}
+  `;
+
+  rendered[page] = true;
+
+  // ── Render charts ──
+  const mo = fd.monthly;
+  const labels = mo.labels;
+
+  mkChart(`${page}-monthly`,{type:'bar',
+    data:{labels,datasets:[
+      {label:'Revenue',data:mo.sell,backgroundColor:col+'88',borderColor:col,borderWidth:1,borderRadius:4},
+      {label:'Cost',data:mo.cost,backgroundColor:'rgba(239,68,68,0.3)',borderColor:'#ef4444',borderWidth:1,borderRadius:4},
+      {label:'Profit',data:mo.profit,type:'line',borderColor:'#10b981',
+       backgroundColor:'rgba(16,185,129,0.08)',borderWidth:2,pointRadius:4,
+       pointBackgroundColor:'#10b981',fill:true}
+    ]},
+    options:{...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins,
+      legend:{display:true,position:'bottom',labels:{color:'#718096',font:{size:10},boxWidth:10,padding:10}}}}
+  });
+
+  const margins2 = mo.sell.map((s,i)=>s?+(mo.profit[i]/s*100).toFixed(2):0);
+  mkChart(`${page}-margin`,{type:'line',
+    data:{labels,datasets:[{label:'Margin %',data:margins2,
+      borderColor:col,backgroundColor:col+'15',borderWidth:2.5,
+      pointRadius:5,pointBackgroundColor:col,fill:true}]},
+    options:{...CHART_DEFAULTS,scales:{...CHART_DEFAULTS.scales,
+      y:{...CHART_DEFAULTS.scales.y,ticks:{color:'#718096',font:{size:10},callback:v=>v+'%'}}},
+    plugins:{...CHART_DEFAULTS.plugins,tooltip:{...CHART_DEFAULTS.plugins.tooltip,
+      callbacks:{label:ctx=>' Margin: '+ctx.parsed.y+'%'}}}}
+  });
+
+  mkChart(`${page}-txns`,{type:'bar',
+    data:{labels,datasets:[{label:'Txns',data:mo.txns,
+      backgroundColor:labels.map((_,i)=>col+(i%2===0?'cc':'77')),borderRadius:4}]},
+    options:{...CHART_DEFAULTS}
+  });
+
+  if(fd.gds.length>0 && document.getElementById(`${page}-gds`)){
+    const gdsFiltered = fd.gds.filter(g=>g.segs>0||g.txns>0);
+    mkChart(`${page}-gds`,{type:'doughnut',
+      data:{labels:gdsFiltered.map(g=>g.name),
+        datasets:[{data:gdsFiltered.map(g=>g.segs||g.txns),
+          backgroundColor:PALETTE,
+          borderColor:'#ffffff',borderWidth:3,hoverOffset:6}]},
+      options:{responsive:true,maintainAspectRatio:true,cutout:'60%',
+        plugins:{legend:{display:true,position:'bottom',
+          labels:{color:'#718096',font:{size:10},boxWidth:10,padding:8}},
+        tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+ctx.parsed+' segs'}}}}
+    });
+  } else if(fd.suppliers.length>0 && document.getElementById(`${page}-supp-bar`)){
+    const top6 = fd.suppliers.slice(0,6);
+    mkChart(`${page}-supp-bar`,{type:'bar',
+      data:{labels:top6.map(s=>s.name.substring(0,12)),
+        datasets:[
+          {label:'Revenue',data:top6.map(s=>s.sell),backgroundColor:col+'99',borderRadius:4},
+          {label:'Profit',data:top6.map(s=>s.profit),backgroundColor:'rgba(16,185,129,0.5)',borderRadius:4}
+        ]},
+      options:{...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins,
+        legend:{display:true,position:'bottom',labels:{color:'#718096',font:{size:10},boxWidth:10}}}}
+    });
+  }
+
+  if(fd.carriers.length>0 && document.getElementById(`${page}-carrier`)){
+    mkChart(`${page}-carrier`,{type:'bar',
+      data:{labels:fd.carriers.map(c=>c.name),
+        datasets:[
+          {label:'Revenue',data:fd.carriers.map(c=>c.sell),backgroundColor:col+'88',borderRadius:3},
+          {label:'Profit',data:fd.carriers.map(c=>c.profit),backgroundColor:'rgba(16,185,129,0.5)',borderRadius:3}
+        ]},
+      options:{...CHART_DEFAULTS,indexAxis:'y',
+        scales:{
+          x:{grid:{color:'#f1f5f9'},ticks:{color:'#718096',font:{size:10},callback:v=>'Q'+fmtK(v)}},
+          y:{grid:{display:false},ticks:{color:'#718096',font:{size:10}}}
+        },
+        plugins:{...CHART_DEFAULTS.plugins,
+          legend:{display:true,position:'bottom',labels:{color:'#718096',font:{size:10},boxWidth:10}}}}
+    });
+  }
+
+  // Customer progress bars
+  const custBarsEl = document.getElementById(`${page}-cust-bars`);
+  if(custBarsEl && fd.customers.length>0){
+    const maxSell = Math.max(...fd.customers.map(c=>c.sell));
+    custBarsEl.innerHTML = fd.customers.slice(0,8).map((c,i)=>`
+    <div class="progress-item">
+      <div class="progress-label">
+        <span class="progress-name">${c.name}</span>
+        <span class="progress-val">${fmtK(c.sell)} &nbsp;|&nbsp; <span style="color:var(--green)">${pct(c.profit,c.sell)}</span></span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${(c.sell/maxSell*100).toFixed(1)}%;background:${col}${i<3?'':'88'}"></div>
+      </div>
+    </div>`).join('');
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', ()=>{
+  showPage('summary');
+  setTimeout(renderSummary, 100);
+});
+</script>
+</body>
+</html>
